@@ -33,7 +33,7 @@ inline fun <reified DESTINATION : NavigationGraph> NavGraphBuilder.navigationCom
         { animationType.inPopExitAnimation() }
     ) { backStackEntry ->
 
-        val navigator = LocalNavigator.current[DESTINATION::class.getGraph()]
+        val navigator = LocalNavigator.getNavigator(key = DESTINATION::class.getGraph())
         (navigator?.currentDestination as? DESTINATION)?.let { value ->
             content(backStackEntry, value)
         } ?:
