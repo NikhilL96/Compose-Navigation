@@ -3,30 +3,31 @@ package com.example.composecustomnavigation.components
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.composecustomnavigation.navhelper.CustomNavHost
 import com.example.composecustomnavigation.DashboardGraph
-import com.example.composecustomnavigation.navhelper.navigationComposable
-import com.example.composecustomnavigation.navhelper.rememberNavigator
+import com.example.navigationcore.ComposeNavHost
+import com.example.navigationcore.destinationComposable
+import com.example.navigationcore.rememberDestinationNavController
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun DashboardNavHost(
+internal fun DashboardNavHost(
     modifier: Modifier,
     startDestination: DashboardGraph = DashboardGraph.DashboardScreen1
 ) {
-    val navigator = rememberNavigator<DashboardGraph>()
+    val navController =
+        rememberDestinationNavController(startDestination = startDestination)
 
-    CustomNavHost(modifier = modifier, navigator = navigator, startDestination = startDestination) {
+    ComposeNavHost(modifier = modifier, navController = navController) {
 
-        navigationComposable<DashboardGraph.DashboardScreen1> { navBackStackEntry, data ->
+        destinationComposable<DashboardGraph.DashboardScreen1> { navBackStackEntry, data ->
             DashboardScreen1()
         }
 
-        navigationComposable<DashboardGraph.DashboardScreen2> { navBackStackEntry, data ->
+        destinationComposable<DashboardGraph.DashboardScreen2> { navBackStackEntry, data ->
             DashboardScreen2()
         }
 
-        navigationComposable<DashboardGraph.DashboardScreen3> { navBackStackEntry, data ->
+        destinationComposable<DashboardGraph.DashboardScreen3> { navBackStackEntry, data ->
             DashboardScreen3()
         }
     }

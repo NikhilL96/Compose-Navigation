@@ -4,26 +4,29 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.composecustomnavigation.HomeGraph
-import com.example.composecustomnavigation.navhelper.AnimationType
-import com.example.composecustomnavigation.navhelper.CustomNavHost
-import com.example.composecustomnavigation.navhelper.CustomNavigator
-import com.example.composecustomnavigation.navhelper.navigationComposable
+import com.example.navigationcore.AnimationType
+import com.example.navigationcore.ComposeNavHost
+import com.example.navigationcore.ComposeNavHostController
+import com.example.navigationcore.destinationComposable
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
-fun HomeBottomNavHost(navigator: CustomNavigator<HomeGraph>, modifier: Modifier, startDestination: HomeGraph = HomeGraph.DashboardScreen) {
+internal fun HomeBottomNavHost(navExtrasHostController: ComposeNavHostController<HomeGraph>, modifier: Modifier, startDestination: HomeGraph = HomeGraph.DashboardScreen) {
 
-    CustomNavHost(modifier = modifier, navigator = navigator, startDestination = startDestination) {
+    ComposeNavHost(
+        modifier = modifier,
+        navController = navExtrasHostController
+    ) {
 
-        navigationComposable<HomeGraph.DashboardScreen>(animationType = AnimationType.FADE) { navBackStackEntry, data ->
+        destinationComposable<HomeGraph.DashboardScreen>(animationType = AnimationType.FADE) { navBackStackEntry, data ->
             DashboardScreen()
         }
 
-        navigationComposable<HomeGraph.NotificationScreen>(animationType = AnimationType.FADE) { navBackStackEntry, data ->
+        destinationComposable<HomeGraph.NotificationScreen>(animationType = AnimationType.FADE) { navBackStackEntry, data ->
             NotificationScreen()
         }
 
-        navigationComposable<HomeGraph.ProfileScreen>(animationType = AnimationType.FADE) { navBackStackEntry, data ->
+        destinationComposable<HomeGraph.ProfileScreen>(animationType = AnimationType.FADE) { navBackStackEntry, data ->
             ProfileScreen(data.value)
         }
     }

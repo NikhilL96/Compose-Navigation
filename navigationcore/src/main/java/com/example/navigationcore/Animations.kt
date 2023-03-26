@@ -1,4 +1,4 @@
-package com.example.composecustomnavigation.navhelper
+package com.example.navigationcore
 
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition

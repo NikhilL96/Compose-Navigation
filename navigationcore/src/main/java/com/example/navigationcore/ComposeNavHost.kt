@@ -1,10 +1,9 @@
-package com.example.composecustomnavigation.navhelper
+package com.example.navigationcore
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavGraphBuilder
@@ -13,33 +12,26 @@ import com.google.accompanist.navigation.animation.AnimatedNavHost
 
 @Composable
 @ExperimentalAnimationApi
-inline fun <reified D : NavigationGraph> CustomNavHost(
-    navigator: CustomNavigator<D>,
-    startDestination: D,
+inline fun <reified D : Destination<D>> ComposeNavHost(
+    navController: ComposeNavHostController<D>,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.Center,
     route: String? = null,
     animationType: AnimationType = AnimationType.FADE,
     noinline builder: NavGraphBuilder.() -> Unit
 ) {
-    LaunchedEffect(key1 = Unit, block = {
-        navigator.setStartDestination(startDestination)
-    })
-    
+
+
     CompositionLocalProvider(
-        LocalNavigator provides LocalNavigator.current.toMutableMap().apply {
-            if(!this.containsKey(D::class))
-                this[D::class] = navigator
-        }
+        LocalNavController provides LocalNavController.current.appendNavController(
+            D::class.getRoute(),
+            navController
+        )
     ) {
 
-        BackHandler {
-            navigator.popBackStack()
-        }
-
         AnimatedNavHost(
-            navigator.navController,
-            startDestination.route,
+            navController,
+            navController.startDestination.route,
             modifier,
             contentAlignment,
             route,
@@ -51,3 +43,19 @@ inline fun <reified D : NavigationGraph> CustomNavHost(
         )
     }
 }
+
+internal typealias NavControllerMap = LinkedHashMap<String, ComposeNavHostController<out Destination<*>>>
+
+fun <D : Destination<D>> NavControllerMap.appendNavController(
+    key: String,
+    navController: ComposeNavHostController<D>
+): NavControllerMap {
+    val original = this
+    return NavControllerMap().apply {
+        original.forEach { (t, u) -> this[t] = u }
+        this[key] = navController
+    }
+}
+
+val LocalNavController = compositionLocalOf<NavControllerMap> { linkedMapOf() }
+

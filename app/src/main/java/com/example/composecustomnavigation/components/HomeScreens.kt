@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun DashboardScreen() {
+internal fun DashboardScreen() {
     Box(modifier = Modifier.fillMaxSize()) {
         DashboardNavHost(modifier = Modifier.fillMaxSize())
     }
@@ -21,7 +21,7 @@ fun DashboardScreen() {
 
 
 @Composable
-fun NotificationScreen() {
+internal fun NotificationScreen() {
     Box(modifier = Modifier
         .fillMaxSize()
         .background(Color.Yellow.copy(alpha = 0.3f))) {
@@ -31,7 +31,7 @@ fun NotificationScreen() {
 
 
 @Composable
-fun ProfileScreen(data: String) {
+internal fun ProfileScreen(data: String) {
     Column(modifier = Modifier
         .fillMaxSize()
         .background(Color.Blue.copy(alpha = 0.3f)),

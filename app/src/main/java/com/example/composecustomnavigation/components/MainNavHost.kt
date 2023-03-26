@@ -2,31 +2,33 @@ package com.example.composecustomnavigation.components
 
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
-import com.example.composecustomnavigation.navhelper.CustomNavHost
 import com.example.composecustomnavigation.MainGraph
-import com.example.composecustomnavigation.navhelper.navigationComposable
-import com.example.composecustomnavigation.navhelper.rememberNavigator
+import com.example.navigationcore.ComposeNavHost
+import com.example.navigationcore.destinationComposable
+import com.example.navigationcore.rememberDestinationNavController
 
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun MainNavHost() {
 
-    val navigator = rememberNavigator<MainGraph>()
-    CustomNavHost(navigator = navigator, startDestination = MainGraph.HomeScreen()) {
+    val navController =
+        rememberDestinationNavController(startDestination = MainGraph.HomeScreen())
 
-        navigationComposable<MainGraph.HomeScreen> { navBackStackEntry, data ->
+    ComposeNavHost(navController = navController) {
+
+        destinationComposable<MainGraph.HomeScreen> { navBackStackEntry, data ->
             HomeScreen(data.startDestination)
         }
 
-        navigationComposable<MainGraph.OtherScreen> { navBackStackEntry, data ->
+        destinationComposable<MainGraph.OtherScreen> { navBackStackEntry, data ->
             OtherScreen(value = data.value)
         }
 
-        navigationComposable<MainGraph.AnotherScreen> { navBackStackEntry, data ->
+        destinationComposable<MainGraph.AnotherScreen> { navBackStackEntry, data ->
             AnotherScreen(value = data.value)
         }
 
-        navigationComposable<MainGraph.SomeOtherScreen> { navBackStackEntry, data ->
+        destinationComposable<MainGraph.SomeOtherScreen> { navBackStackEntry, data ->
             SomeotherScreen(value = data.value1, value1 = data.value2)
         }
     }

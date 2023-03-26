@@ -12,6 +12,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,19 +21,23 @@ import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.example.composecustomnavigation.HomeGraph
 import com.example.composecustomnavigation.MainGraph
-import com.example.composecustomnavigation.navhelper.LocalNavigator
-import com.example.composecustomnavigation.navhelper.getNavigator
-import com.example.composecustomnavigation.navhelper.rememberNavigator
+import com.example.navigationcore.LocalNavController
+import com.example.navigationcore.getNavController
+import com.example.navigationcore.getRoute
+import com.example.navigationcore.rememberDestinationNavController
 
 
 @Composable
-fun HomeScreen(startBottomNavDestination: HomeGraph = HomeGraph.DashboardScreen) {
+internal fun HomeScreen(startBottomNavDestination: HomeGraph = HomeGraph.DashboardScreen) {
 
-    val navigator = rememberNavigator<HomeGraph>()
+    val mainNavController = LocalNavController.getNavController(graph = MainGraph::class)
+
+    val navController =
+        rememberDestinationNavController(startDestination = HomeGraph.DashboardScreen)
 
     Scaffold(bottomBar = {
         BottomNavigation {
-            val navBackStackEntry by navigator.navController.currentBackStackEntryAsState()
+            val navBackStackEntry by navController.currentBackStackEntryAsState()
             val currentDestination = navBackStackEntry?.destination
             val items = HomeGraph.getBottomNavDataList()
             items.forEach { item ->
@@ -41,20 +46,40 @@ fun HomeScreen(startBottomNavDestination: HomeGraph = HomeGraph.DashboardScreen)
                     label = { Text(item.bottomBarData.first, color = Color.Black) },
                     selected = currentDestination?.hierarchy?.any { it.route == item.route } == true,
                     onClick = {
-                        navigator.navigateTo(item, popupTo = HomeGraph.DashboardScreen::class)
+                        navController.navigate(item) {
+                            popUpTo(HomeGraph.DashboardScreen.route)
+                            launchSingleTop = true
+                        }
                     }
                 )
             }
         }
 
     }) {
-        HomeBottomNavHost(navigator, modifier = Modifier.padding(it), startBottomNavDestination)
+        HomeBottomNavHost(navController, modifier = Modifier.padding(it), startBottomNavDestination)
+    }
+
+
+    LaunchedEffect(key1 = Unit) {
+        mainNavController
+            .currentBackStackEntry
+            ?.savedStateHandle
+            ?.getLiveData<HomeGraph>(MainGraph.HomeScreen.BACK_RESULT_KEY)
+            ?.value?.let {
+                navController.navigate(it) {
+                    popUpTo(HomeGraph.DashboardScreen.route)
+                    launchSingleTop = true
+                }
+            }
+        mainNavController
+            .currentBackStackEntry
+            ?.savedStateHandle?.remove<HomeGraph>(MainGraph.HomeScreen.BACK_RESULT_KEY)
     }
 }
 
 @Composable
-fun OtherScreen(value: String) {
-    val navigator = LocalNavigator.getNavigator(MainGraph::class)
+internal fun OtherScreen(value: String) {
+    val navController = LocalNavController.getNavController(MainGraph::class)
 
     Column(
         modifier = Modifier
@@ -66,13 +91,13 @@ fun OtherScreen(value: String) {
         Text(text = "Other screen")
         Text(modifier = Modifier, text = "Data passed: $value")
         Button({
-            navigator?.navigateTo(destination = MainGraph.AnotherScreen(1))
+            navController.navigate(destination = MainGraph.AnotherScreen(1))
         }) {
             Text(text = "Go to Another Screen")
         }
 
         Button({
-            navigator?.popBackStack()
+            navController.popBackStack()
         }) {
             Text(text = "Back")
         }
@@ -80,8 +105,8 @@ fun OtherScreen(value: String) {
 }
 
 @Composable
-fun AnotherScreen(value: Int) {
-    val navigator = LocalNavigator.getNavigator(MainGraph::class)
+internal fun AnotherScreen(value: Int) {
+    val navController = LocalNavController.getNavController(MainGraph::class)
 
     Column(
         modifier = Modifier
@@ -94,21 +119,26 @@ fun AnotherScreen(value: Int) {
         Text(modifier = Modifier, text = "Data passed: $value")
 
         Button({
-            navigator?.navigateTo(destination = MainGraph.SomeOtherScreen(1, "some-value"))
+            navController.navigate(destination = MainGraph.SomeOtherScreen(1, "some-value"))
         }) {
             Text(text = "Go to Some other screen")
         }
 
         Button({
-            navigator?.popBackStackTo(
-                MainGraph.HomeScreen(HomeGraph.ProfileScreen("Passed data from Another screen"))
+            navController.popBackStack(
+                MainGraph.HomeScreen::class.getRoute(),
+                false,
+                Pair(
+                    MainGraph.HomeScreen.BACK_RESULT_KEY,
+                    HomeGraph.ProfileScreen("Passed data from Another screen")
+                )
             )
         }) {
             Text(text = "Go to Profile")
         }
 
         Button({
-            navigator?.popBackStack()
+            navController.popBackStack()
         }) {
             Text(text = "Back")
         }
@@ -117,19 +147,21 @@ fun AnotherScreen(value: Int) {
 
 
 @Composable
-fun SomeotherScreen(value: Int, value1: String) {
-    val navigator = LocalNavigator.getNavigator(MainGraph::class)
+internal fun SomeotherScreen(value: Int, value1: String) {
+    val navController = LocalNavController.getNavController(MainGraph::class)
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(Color.Red.copy(alpha = 0.3f)),
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(Color.Red.copy(alpha = 0.3f)),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally) {
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(modifier = Modifier, text = "Someother screen")
         Text(modifier = Modifier, text = "Data passed: $value , $value1")
 
         Button({
-            navigator?.popBackStackTo(MainGraph.OtherScreen::class)
+            navController.popBackStack(MainGraph.OtherScreen::class.getRoute(), false)
         }) {
             Text(text = "Back to Other screen")
         }
