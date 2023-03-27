@@ -126,9 +126,8 @@ internal fun AnotherScreen(value: Int) {
 
         Button({
             navController.popBackStack(
-                MainGraph.HomeScreen::class.getRoute(),
-                false,
-                Pair(
+                destinationTo = MainGraph.HomeScreen::class,
+                sendBackData = Pair(
                     MainGraph.HomeScreen.BACK_RESULT_KEY,
                     HomeGraph.ProfileScreen("Passed data from Another screen")
                 )

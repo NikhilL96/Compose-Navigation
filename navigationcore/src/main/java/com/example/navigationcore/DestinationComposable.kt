@@ -1,5 +1,6 @@
 package com.example.navigationcore
 
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibilityScope
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
@@ -15,7 +16,7 @@ import java.util.*
 inline fun <reified DESTINATION : Destination<*>> NavGraphBuilder.destinationComposable(
     arguments: List<NamedNavArgument> = emptyList(),
     deepLinks: List<NavDeepLink> = emptyList(),
-    animationType: AnimationType = AnimationType.SLIDE_HORIZONTAL,
+    crossinline animationType: (AnimatedContentScope<NavBackStackEntry>) -> AnimationType = { AnimationType.SLIDE_HORIZONTAL },
     crossinline content: @Composable AnimatedVisibilityScope.(NavBackStackEntry, DESTINATION) -> Unit
 ) {
     val route = DESTINATION::class.getRoute()
@@ -24,10 +25,10 @@ inline fun <reified DESTINATION : Destination<*>> NavGraphBuilder.destinationCom
         route,
         arguments,
         deepLinks,
-        { animationType.inEnterAnimation() },
-        { animationType.inExitAnimation() },
-        { animationType.inPopEnterAnimation() },
-        { animationType.inPopExitAnimation() }
+        { animationType(this).inEnterAnimation() },
+        { animationType(this).inExitAnimation() },
+        { animationType(this).inPopEnterAnimation() },
+        { animationType(this).inPopExitAnimation() }
     ) { backStackEntry ->
 
         val navController = LocalNavController.current.values.last()

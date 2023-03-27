@@ -74,17 +74,19 @@ class ComposeNavHostController<D : Destination<D>>(
     }
 
     fun <T> popBackStack(
-        route: String,
-        inclusive: Boolean,
-        sendBackData: Pair<String, T>,
+        destinationTo: KClass<out D>,
+        sendBackData: Pair<String, T>? = null,
         savedState: Boolean = false
     ): Boolean {
-        backQueue.lastOrNull {
-            it.destination.route == route
-        }?.savedStateHandle?.apply {
-            set(sendBackData.first, sendBackData.second)
+        sendBackData?.let{
+            backQueue.lastOrNull {
+                it.destination.route == destinationTo.getRoute()
+            }?.savedStateHandle?.apply {
+                set(sendBackData.first, sendBackData.second)
+            }
         }
-        return super.popBackStack(route, inclusive, savedState)
+
+        return super.popBackStack(destinationTo.getRoute(), false, savedState)
     }
 
 

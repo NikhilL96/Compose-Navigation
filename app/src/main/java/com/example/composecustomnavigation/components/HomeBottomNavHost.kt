@@ -18,15 +18,15 @@ internal fun HomeBottomNavHost(navExtrasHostController: ComposeNavHostController
         navController = navExtrasHostController
     ) {
 
-        destinationComposable<HomeGraph.DashboardScreen>(animationType = AnimationType.FADE) { navBackStackEntry, data ->
+        destinationComposable<HomeGraph.DashboardScreen>(animationType = { AnimationType.FADE }) { navBackStackEntry, data ->
             DashboardScreen()
         }
 
-        destinationComposable<HomeGraph.NotificationScreen>(animationType = AnimationType.FADE) { navBackStackEntry, data ->
+        destinationComposable<HomeGraph.NotificationScreen>(animationType = { AnimationType.FADE }) { navBackStackEntry, data ->
             NotificationScreen()
         }
 
-        destinationComposable<HomeGraph.ProfileScreen>(animationType = AnimationType.FADE) { navBackStackEntry, data ->
+        destinationComposable<HomeGraph.ProfileScreen>(animationType = { AnimationType.FADE }) { navBackStackEntry, data ->
             ProfileScreen(data.value)
         }
     }
