@@ -1,0 +1,1 @@
+This repo demonstrates the usage of a custom navigation approach in Jetpack compose on Android leveraging animation transitions and complex object data passing capabilities between different screens utilizing a custom implementation of NavHostController
